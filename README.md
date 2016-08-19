@@ -15,3 +15,9 @@ To install:
     cd rs
     python setup.py develop
 
+TomTom File Creation
+====================
+
+For TomTom, create an .ov2 file
+
+    http://www.poieditor.com/
