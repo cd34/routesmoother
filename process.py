@@ -8,7 +8,7 @@ import tcx
 def main(args):
     latlongs = []
     if args.filename.endswith('.tcx'):
-        latlongs = tcx.process_tcx(args.filename)
+        latlongs = tcx.process_tcx(filename=args.filename)
     if args.filename.endswith('.csv'):
         latlongs = routesmoother.process_csv(args.filename)
     if len(latlongs) > 0:

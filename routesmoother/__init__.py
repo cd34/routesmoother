@@ -2,7 +2,7 @@ import csv
 import math
 
 from geopy.distance import vincenty
-import tcx
+import xml.etree.ElementTree as ET
 
 def return_points(points, num_points):
     '''
@@ -28,6 +28,8 @@ def smoother(latlongs, meters):
         if distance > meters:
             point_distance = vincenty(x['pos'], prev_latlong).meters
             num_points = math.floor(point_distance / meters) - 2
+            if num_points < 1:
+                num_points = 1
 
             '''
             some weird smoothing artifacts happen if we try to play the length, so,
@@ -37,6 +39,7 @@ def smoother(latlongs, meters):
             '''
 
             export_latlongs.extend(return_points([prev_latlong, x['pos']], num_points))
+            x['pos'] = export_latlongs[-1]['pos']
             distance = 0
         prev_latlong = x['pos']
     
@@ -79,3 +82,33 @@ def process_csv(filename):
             prev_latlong = (latitude, longitude)
             latlongs.append({'pos': (latitude, longitude), 'distance': distance, 'description':description})
         return(latlongs)
+
+def process_tcx(filename=None, contents=None):
+    tree = ''
+    root = ''
+    if filename:
+        tree = ET.parse(filename)
+        root = tree.getroot()
+    if contents:
+        root = ET.fromstring(contents)
+
+    latlongs = []
+    prev_latlong = ()
+
+    for child in root.find('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Courses'). \
+            find('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Course'). \
+            find('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Track'). \
+            findall('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Trackpoint'):
+        latitude = float(child.find('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Position'). \
+            find('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LatitudeDegrees').text)
+        longitude = float(child.find('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}Position'). \
+            find('{http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2}LongitudeDegrees').text)
+        
+        distance = 0
+        if prev_latlong:
+            distance = vincenty((latitude, longitude),prev_latlong).meters
+            
+        prev_latlong = (latitude, longitude)
+
+        latlongs.append({'pos': (latitude, longitude), 'distance': distance})
+    return latlongs
