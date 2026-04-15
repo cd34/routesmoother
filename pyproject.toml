@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "routesmoother"
+version = "0.1.0"
+description = "Smooth GPS route files for Garmin Nuvi and TomTom Via devices"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.8"
+dependencies = [
+    "geopy",
+]
+
+[project.scripts]
+routesmoother = "process:main"

@@ -1,7 +1,7 @@
 import csv
 import math
 
-from geopy.distance import vincenty
+from geopy.distance import geodesic
 import xml.etree.ElementTree as ET
 
 def return_points(points, num_points):
@@ -26,7 +26,7 @@ def smoother(latlongs, meters):
     for x in latlongs[1:-1]:
         distance += x['distance']
         if distance > meters:
-            point_distance = vincenty(x['pos'], prev_latlong).meters
+            point_distance = geodesic(x['pos'], prev_latlong).meters
             num_points = math.floor(point_distance / meters) - 2
             if num_points < 1:
                 num_points = 1
@@ -47,25 +47,6 @@ def smoother(latlongs, meters):
 
     return (export_latlongs)
 
-"""
-for pos in export_latlongs:
-    print('{{ lat: {}, lng: {}}}').format(pos[0], pos[1])
-
-tomtom_poi = []
-for count, latlong in enumerate(latlongs):
-    print type(latlong['pos'][0])
-    tomtom_poi.append([str(count), latlong['pos'][0], latlong['pos'][1]])
-
-libov2.writeOV2(tomtom_poi, 'test.ov2')
-"""
-
-"""
-        for poiset in data:
-                uName = poiset[0] + '\0'
-                name = uName.encode(_CHARSET)
-                lat = poiset[1]
-                long = poiset[2]
-"""
 def process_csv(filename):
     with open(filename) as csvfile:
         input_file = csv.reader(csvfile, delimiter=',')
@@ -78,7 +59,7 @@ def process_csv(filename):
             latitude = float(latitude)
             longitude = float(longitude)
             if prev_latlong:
-                distance = vincenty((latitude, longitude),prev_latlong).meters
+                distance = geodesic((latitude, longitude),prev_latlong).meters
             prev_latlong = (latitude, longitude)
             latlongs.append({'pos': (latitude, longitude), 'distance': distance, 'description':description})
         return(latlongs)
@@ -106,7 +87,7 @@ def process_tcx(filename=None, contents=None):
         
         distance = 0
         if prev_latlong:
-            distance = vincenty((latitude, longitude),prev_latlong).meters
+            distance = geodesic((latitude, longitude),prev_latlong).meters
             
         prev_latlong = (latitude, longitude)
 

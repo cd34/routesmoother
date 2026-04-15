@@ -8,16 +8,18 @@ For Garmin Nuvi or TomTom Via units.
 
 To install:
 
-    virtualenv /var/www/routesmoother
-    cd /var/www/routesmoother
-    source bin/activate
-    git clone git@github.com:cd34/routesmoother.git rs
-    cd rs
-    python setup.py develop
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -e .
 
-TomTom File Creation
-====================
+Usage:
 
-For TomTom, create an .ov2 file
+    python process.py --garmin route.tcx      # Output Garmin CSV
+    python process.py --tomtom route.tcx       # Output TomTom CSV
+    python process.py --google route.csv       # Output Google Maps JS
+    python process.py --spacing 200 route.tcx  # Custom spacing (default 150m)
+    python process.py --nosmooth route.tcx     # Convert without smoothing
 
-    http://www.poieditor.com/
+TomTom OV2 File Creation:
+
+    For TomTom, create an .ov2 file using http://www.poieditor.com/
